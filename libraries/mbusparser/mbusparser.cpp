@@ -139,19 +139,9 @@ MeterData parseMbusFrame(const VectorView& frame)
       result.activePowerMinus = getPower(frame, ACTIVE_POWER_MINUS, result.activePowerMinusValid);
       result.reactivePowerPlus = getPower(frame, REACTIVE_POWER_PLUS, result.reactivePowerPlusValid);
       result.reactivePowerMinus = getPower(frame, REACTIVE_POWER_MINUS, result.reactivePowerMinusValid);
-      bool success = false;
-      result.currentL1 = getPower(frame, CURRENT_L1, success)/100.0;
-      if (!success) {
-	result.currentL1 = NAN;
-      }
-      result.currentL2 = getPower(frame, CURRENT_L2, success)/100.0;
-      if (!success) {
-	result.currentL2 = NAN;
-      }
-      result.currentL3 = getPower(frame, CURRENT_L3, success)/100.0;
-      if (!success) {
-	result.currentL3 = NAN;
-      }
+      result.centiAmpereL1 = getPower(frame, CURRENT_L1, result.centiAmpereL1Valid);
+      result.centiAmpereL2 = getPower(frame, CURRENT_L2, result.centiAmpereL2Valid);
+      result.centiAmpereL3 = getPower(frame, CURRENT_L3, result.centiAmpereL3Valid);
       result.voltageL1 = getPower(frame, VOLTAGE_L1, result.voltageL1Valid);
       result.voltageL2 = getPower(frame, VOLTAGE_L2, result.voltageL2Valid);
       result.voltageL3 = getPower(frame, VOLTAGE_L3, result.voltageL3Valid);

@@ -1,5 +1,6 @@
 #include "libraries/mbusparser/mbusparser.h"
 #include <iostream>
+#include <cassert>
 
 const uint8_t sample[] = {
   0x7e, 0xa0, 0xe2, 0x2b, 0x21, 0x13, 0x23, 0x9a,
@@ -95,9 +96,15 @@ void printMeterData(const MeterData & meterData)
   if (meterData.reactivePowerMinusValid) {
     std::cout << meterData.reactivePowerMinus << " W" << std::endl;
   }
-  std::cout << "Current phase L1: " << meterData.currentL1 << " A" << std::endl;
-  std::cout << "Current phase L2: " << meterData.currentL2 << " A" << std::endl;
-  std::cout << "Current phase L3: " << meterData.currentL3/100.0 << " A" << std::endl;
+  if (meterData.centiAmpereL1Valid) {
+    std::cout << "Current phase L1: " << meterData.centiAmpereL1/100.0 << " A" << std::endl;
+  }
+  if (meterData.centiAmpereL2Valid) {
+    std::cout << "Current phase L2: " << meterData.centiAmpereL2/100.0 << " A" << std::endl;
+  }
+  if (meterData.centiAmpereL3Valid) {
+    std::cout << "Current phase L3: " << meterData.centiAmpereL3/100.0 << " A" << std::endl;
+  }
 
   std::cout << "Voltage phase L1: ";
   if (meterData.voltageL1Valid) {
@@ -125,6 +132,19 @@ void printFrame(const VectorView& frame)
   std::cout << std::dec << std::endl;
 }
 
+void testIntegerDivisionPrinting()
+{
+  uint32_t centiAmpere = 12345;
+  char msg[60];
+  int position = 0;
+  position += snprintf(msg+position, sizeof(msg)-position, "%u", centiAmpere / 100);
+  position += snprintf(msg+position, sizeof(msg)-position, ".");
+  position += snprintf(msg+position, sizeof(msg)-position, "%u", centiAmpere % 100);
+  std::string result(msg);
+  std::cout << "Integer division test result: " << msg << " expected: " << "123.45" << std::endl;
+  assert(result == "123.45");
+}
+
 int main() {
   std::vector<uint8_t> buffer = std::vector<uint8_t>(messysample, messysample+sizeof(messysample));
   std::vector<VectorView> frames = getFrames(buffer);
@@ -134,4 +154,5 @@ int main() {
     MeterData powerInfo = parseMbusFrame(frames[i]);
     printMeterData(powerInfo);
   }
+  testIntegerDivisionPrinting();
 }

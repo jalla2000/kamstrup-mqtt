@@ -104,6 +104,28 @@ void parseData() {
 	snprintf(msg, sizeof(msg), "%ld", md.voltageL3);
 	client.publish("house/electricity/voltage/l3", msg);
       }
+
+      if (md.centiAmpereL1Valid) {
+        int position = 0;
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 / 100);
+        position += snprintf(msg+position, sizeof(msg)-position, ".");
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 % 100);
+        client.publish("house/electricity/current/l1", msg);
+      }
+      if (md.centiAmpereL2Valid) {
+        int position = 0;
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 / 100);
+        position += snprintf(msg+position, sizeof(msg)-position, ".");
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 % 100);
+        client.publish("house/electricity/current/l2", msg);
+      }
+      if (md.centiAmpereL3Valid) {
+        int position = 0;
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 / 100);
+        position += snprintf(msg+position, sizeof(msg)-position, ".");
+        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 % 100);
+        client.publish("house/electricity/current/l3", msg);
+      }
     }
     receiveBuffer.clear();
   }

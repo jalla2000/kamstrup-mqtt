@@ -28,9 +28,12 @@ struct MeterData {
   bool voltageL3Valid = false;
 
   // Current L1/L2/L3
-  float currentL1 = 0;
-  float currentL2 = 0;
-  float currentL3 = 0;
+  uint32_t centiAmpereL1 = 0;
+  bool centiAmpereL1Valid = false;
+  uint32_t centiAmpereL2 = 0;
+  bool centiAmpereL2Valid = false;
+  uint32_t centiAmpereL3 = 0;
+  bool centiAmpereL3Valid = false;
 };
 
 struct VectorView {
