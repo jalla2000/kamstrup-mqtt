@@ -74,18 +74,36 @@ void parseData() {
   if (frames.size() > 0) {
     for (VectorView vv : frames) {
       MeterData md = parseMbusFrame(vv);
-    
-      snprintf(msg, sizeof(msg), "%ld", md.activePowerPlus);
-      client.publish("house/electricity/power/activePowerPlus", msg);
-      snprintf(msg, sizeof(msg), "%ld", md.activePowerMinus);
-      client.publish("house/electricity/power/activePowerMinus", msg);
 
-      snprintf(msg, sizeof(msg), "%ld", md.voltageL1);
-      client.publish("house/electricity/voltage/l1", msg);
-      snprintf(msg, sizeof(msg), "%ld", md.voltageL2);
-      client.publish("house/electricity/voltage/l2", msg);
-      snprintf(msg, sizeof(msg), "%ld", md.voltageL3);
-      client.publish("house/electricity/voltage/l3", msg);
+      if (md.activePowerPlusValid) {
+	snprintf(msg, sizeof(msg), "%ld", md.activePowerPlus);
+	client.publish("house/electricity/power/activePowerPlus", msg);
+      }
+      if (md.activePowerMinusValid) {
+	snprintf(msg, sizeof(msg), "%ld", md.activePowerMinus);
+	client.publish("house/electricity/power/activePowerMinus", msg);
+      }
+      if (md.reactivePowerPlusValid) {
+	snprintf(msg, sizeof(msg), "%ld", md.reactivePowerPlus);
+	client.publish("house/electricity/power/reactivePowerPlus", msg);
+      }
+      if (md.reactivePowerMinusValid) {
+	snprintf(msg, sizeof(msg), "%ld", md.reactivePowerMinus);
+	client.publish("house/electricity/power/reactivePowerMinus", msg);
+      }
+
+      if (md.voltageL1Valid) {
+	snprintf(msg, sizeof(msg), "%ld", md.voltageL1);
+	client.publish("house/electricity/voltage/l1", msg);
+      }
+      if (md.voltageL2Valid) {
+	snprintf(msg, sizeof(msg), "%ld", md.voltageL2);
+	client.publish("house/electricity/voltage/l2", msg);
+      }
+      if (md.voltageL3Valid) {
+	snprintf(msg, sizeof(msg), "%ld", md.voltageL3);
+	client.publish("house/electricity/voltage/l3", msg);
+      }
     }
     receiveBuffer.clear();
   }
