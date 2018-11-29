@@ -10,7 +10,6 @@ static const char* mqtt_server = "192.168.10.58";
 WiFiClient espClient;
 PubSubClient client(espClient);
 char msg[60];
-int loopCounter = 0;
 
 // Power meter serial com
 std::vector<uint8_t> receiveBuffer;
@@ -57,9 +56,8 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str(), "mqttclient", "YourPassword")) {
       Serial1.println("connected");
-//      // Once connected, publish an announcement...
-//      client.publish("house/electricity/total/status", "Initializing");
-      // client.subscribe("inTopic");
+      // Once connected, publish an announcement...
+      client.publish("house/electricity/total/status", "Initializing");
     } else {
       Serial1.print("failed, rc=");
       Serial1.print(client.state());
@@ -108,6 +106,7 @@ void setup() {
 }
 
 int bytesReceived = 0;
+int loopCounter = 0;
 
 // the loop function runs over and over again forever
 void loop() {
