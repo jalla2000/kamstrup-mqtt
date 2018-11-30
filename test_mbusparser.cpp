@@ -145,6 +145,32 @@ void testIntegerDivisionPrinting()
   assert(result == "123.45");
 }
 
+void writeFrameAsHex(char* buf, size_t bufsize, const VectorView& frame)
+{
+  size_t position = 0;
+  for (size_t i = 0; i < frame.size(); ++i) {
+    position += snprintf(buf+position, bufsize-position, "%02X", frame[i]);
+  }
+}
+
+
+void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const VectorView& frame)
+{
+  size_t position = 0;
+  position += snprintf(buf+position, bufsize-position, "P+=%d ", md.activePowerPlusValid);
+  position += snprintf(buf+position, bufsize-position, "P-=%d ", md.activePowerMinusValid);
+  position += snprintf(buf+position, bufsize-position, "R+=%d ", md.reactivePowerMinusValid);
+  position += snprintf(buf+position, bufsize-position, "R-=%d ", md.reactivePowerPlusValid);
+  position += snprintf(buf+position, bufsize-position, "V1=%d ", md.voltageL1Valid);
+  position += snprintf(buf+position, bufsize-position, "V2=%d ", md.voltageL2Valid);
+  position += snprintf(buf+position, bufsize-position, "V3=%d ", md.voltageL3Valid);
+  position += snprintf(buf+position, bufsize-position, "A1=%d ", md.centiAmpereL1Valid);
+  position += snprintf(buf+position, bufsize-position, "A2=%d ", md.centiAmpereL2Valid);
+  position += snprintf(buf+position, bufsize-position, "A3=%d", md.centiAmpereL3Valid);
+  position += snprintf(buf+position, bufsize-position, " ");
+  writeFrameAsHex(buf+position, bufsize-position, frame);
+}
+
 int main() {
   std::vector<uint8_t> buffer = std::vector<uint8_t>(messysample, messysample+sizeof(messysample));
   std::vector<VectorView> frames = getFrames(buffer);
@@ -153,6 +179,16 @@ int main() {
     //printFrame(frames[i]);
     MeterData powerInfo = parseMbusFrame(frames[i]);
     printMeterData(powerInfo);
+    {
+      char hexbuf[1000];
+      writeFrameAsHex(hexbuf, sizeof(hexbuf), frames[i]);
+      std::cout << "Frame as hex: " << hexbuf << std::endl;
+    }
+    {
+      char debugbuf[1000];
+      writeDebugStringToBuf(debugbuf, sizeof(debugbuf), powerInfo, frames[i]);
+      std::cout << "Debug text: " << debugbuf << std::endl;
+    }
   }
   testIntegerDivisionPrinting();
 }
