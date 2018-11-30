@@ -11,10 +11,12 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
     //std::cout << "Now searching from offset=" << offset << std::endl;
     size_t start = 0;
     bool startFound = false;
+    uint16_t messageSize = 0;
     for (size_t i = offset; i < data.size()-1; ++i) {
-      if (data[i] == 0x7E && data[i+1] != 0x7E) {
+      if (data[i] == 0x7E && (data[i+1]&0xF0) == 0xA0) {
 	startFound = true;
 	start = i;
+	messageSize = (data[i+1]&0x0F << 8) | data[i+2];
 	break;
       }
     }
@@ -23,11 +25,10 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
     }
     size_t end = 0;
     bool endFound = false;
-    for (size_t i = start+1; i < data.size(); ++i) {
-      if (data[i] == 0x7E) {
+    if (messageSize < data.size()-start) {
+      if (data[start+messageSize+1] == 0x7E) {
 	endFound = true;
-	end = i+1;
-	break;
+	end = start+messageSize+2;
       }
     }
     if (startFound && endFound && (end-start > 2)) {
