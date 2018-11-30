@@ -10,6 +10,7 @@ static const char* mqtt_server = "192.168.10.58";
 WiFiClient espClient;
 PubSubClient client(espClient);
 char msg[60];
+char debugbuf[1000];
 
 // Power meter serial com
 std::vector<uint8_t> receiveBuffer;
@@ -66,6 +67,33 @@ void reconnect() {
       delay(5000);
     }
   }
+}
+
+void writeFrameAsHex(char* buf, size_t bufsize, const VectorView& frame)
+{
+  size_t position = 0;
+  for (size_t i = 0; i < frame.size(); ++i) {
+    position += snprintf(buf+position, bufsize-position, "%02X", frame[i]);
+  }
+}
+
+
+void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const VectorView& frame)
+{
+  size_t position = 0;
+  position += snprintf(buf+position, bufsize-position, "SZ=%d ", frame.size());
+  position += snprintf(buf+position, bufsize-position, "P+=%d ", md.activePowerPlusValid);
+  position += snprintf(buf+position, bufsize-position, "P-=%d ", md.activePowerMinusValid);
+  position += snprintf(buf+position, bufsize-position, "R+=%d ", md.reactivePowerMinusValid);
+  position += snprintf(buf+position, bufsize-position, "R-=%d ", md.reactivePowerPlusValid);
+  position += snprintf(buf+position, bufsize-position, "V1=%d ", md.voltageL1Valid);
+  position += snprintf(buf+position, bufsize-position, "V2=%d ", md.voltageL2Valid);
+  position += snprintf(buf+position, bufsize-position, "V3=%d ", md.voltageL3Valid);
+  position += snprintf(buf+position, bufsize-position, "A1=%d ", md.centiAmpereL1Valid);
+  position += snprintf(buf+position, bufsize-position, "A2=%d ", md.centiAmpereL2Valid);
+  position += snprintf(buf+position, bufsize-position, "A3=%d", md.centiAmpereL3Valid);
+  position += snprintf(buf+position, bufsize-position, " ");
+  writeFrameAsHex(buf+position, bufsize-position, frame);
 }
 
 void parseData() {
@@ -126,6 +154,21 @@ void parseData() {
         position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 % 100);
         client.publish("house/electricity/current/l3", msg);
       }
+
+      if (!md.activePowerPlusValid ||
+          !md.activePowerMinusValid ||
+          !md.reactivePowerPlusValid ||
+          !md.reactivePowerMinusValid ||
+          !md.voltageL1Valid ||
+          !md.voltageL2Valid ||
+          !md.voltageL3Valid ||
+          !md.centiAmpereL1Valid ||
+          !md.centiAmpereL2Valid ||
+          !md.centiAmpereL3Valid)
+      {
+        writeDebugStringToBuf(debugbuf, sizeof(debugbuf), md, vv);
+        client.publish("house/electricity/status", debugbuf);
+      }
     }
     receiveBuffer.clear();
   }
@@ -163,7 +206,7 @@ void loop() {
       if (receiveBuffer.back() == 0x7E && receiveBuffer.size() > 5) {
         parseData();
       }
-      if (receiveBuffer.size() >= 500) {
+      if (receiveBuffer.size() >= 1000) {
         // Make sure we don't fill up the memory
         receiveBuffer.clear();
       }
