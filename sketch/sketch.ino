@@ -13,7 +13,7 @@ char msg[60];
 char debugbuf[1000];
 
 // Power meter serial com
-std::vector<uint8_t> receiveBuffer;
+uint8_t receiveBuffer[1000];
 
 void setup_wifi() {
 
@@ -96,86 +96,79 @@ void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const
   writeFrameAsHex(buf+position, bufsize-position, frame);
 }
 
-void parseData() {
+void parseData(const VectorView& frame) {
   // Parse serial data here, and send to MQTT broker
-  std::vector<VectorView> frames = getFrames(receiveBuffer);
-  if (frames.size() > 0) {
-    for (VectorView vv : frames) {
-      MeterData md = parseMbusFrame(vv);
+  MeterData md = parseMbusFrame(frame);
 
-      if (md.activePowerPlusValid) {
-	snprintf(msg, sizeof(msg), "%ld", md.activePowerPlus);
-	client.publish("house/electricity/power/activePowerPlus", msg);
-      }
-      if (md.activePowerMinusValid) {
-	snprintf(msg, sizeof(msg), "%ld", md.activePowerMinus);
-	client.publish("house/electricity/power/activePowerMinus", msg);
-      }
-      if (md.reactivePowerPlusValid) {
-	snprintf(msg, sizeof(msg), "%ld", md.reactivePowerPlus);
-	client.publish("house/electricity/power/reactivePowerPlus", msg);
-      }
-      if (md.reactivePowerMinusValid) {
-	snprintf(msg, sizeof(msg), "%ld", md.reactivePowerMinus);
-	client.publish("house/electricity/power/reactivePowerMinus", msg);
-      }
+  if (md.activePowerPlusValid) {
+    snprintf(msg, sizeof(msg), "%ld", md.activePowerPlus);
+    client.publish("house/electricity/power/activePowerPlus", msg);
+  }
+  if (md.activePowerMinusValid) {
+    snprintf(msg, sizeof(msg), "%ld", md.activePowerMinus);
+    client.publish("house/electricity/power/activePowerMinus", msg);
+  }
+  if (md.reactivePowerPlusValid) {
+    snprintf(msg, sizeof(msg), "%ld", md.reactivePowerPlus);
+    client.publish("house/electricity/power/reactivePowerPlus", msg);
+  }
+  if (md.reactivePowerMinusValid) {
+    snprintf(msg, sizeof(msg), "%ld", md.reactivePowerMinus);
+    client.publish("house/electricity/power/reactivePowerMinus", msg);
+  }
 
-      if (md.voltageL1Valid) {
-	snprintf(msg, sizeof(msg), "%ld", md.voltageL1);
-	client.publish("house/electricity/voltage/l1", msg);
-      }
-      if (md.voltageL2Valid) {
-	snprintf(msg, sizeof(msg), "%ld", md.voltageL2);
-	client.publish("house/electricity/voltage/l2", msg);
-      }
-      if (md.voltageL3Valid) {
-	snprintf(msg, sizeof(msg), "%ld", md.voltageL3);
-	client.publish("house/electricity/voltage/l3", msg);
-      }
+  if (md.voltageL1Valid) {
+    snprintf(msg, sizeof(msg), "%ld", md.voltageL1);
+    client.publish("house/electricity/voltage/l1", msg);
+  }
+  if (md.voltageL2Valid) {
+    snprintf(msg, sizeof(msg), "%ld", md.voltageL2);
+    client.publish("house/electricity/voltage/l2", msg);
+  }
+  if (md.voltageL3Valid) {
+    snprintf(msg, sizeof(msg), "%ld", md.voltageL3);
+    client.publish("house/electricity/voltage/l3", msg);
+  }
 
-      if (md.centiAmpereL1Valid) {
-        int position = 0;
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 / 100);
-        position += snprintf(msg+position, sizeof(msg)-position, ".");
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 % 100);
-        client.publish("house/electricity/current/l1", msg);
-      }
-      if (md.centiAmpereL2Valid) {
-        int position = 0;
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 / 100);
-        position += snprintf(msg+position, sizeof(msg)-position, ".");
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 % 100);
-        client.publish("house/electricity/current/l2", msg);
-      }
-      if (md.centiAmpereL3Valid) {
-        int position = 0;
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 / 100);
-        position += snprintf(msg+position, sizeof(msg)-position, ".");
-        position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 % 100);
-        client.publish("house/electricity/current/l3", msg);
-      }
+  if (md.centiAmpereL1Valid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 / 100);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL1 % 100);
+    client.publish("house/electricity/current/l1", msg);
+  }
+  if (md.centiAmpereL2Valid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 / 100);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL2 % 100);
+    client.publish("house/electricity/current/l2", msg);
+  }
+  if (md.centiAmpereL3Valid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 / 100);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.centiAmpereL3 % 100);
+    client.publish("house/electricity/current/l3", msg);
+  }
 
-      if (!md.activePowerPlusValid ||
-          !md.activePowerMinusValid ||
-          !md.reactivePowerPlusValid ||
-          !md.reactivePowerMinusValid ||
-          !md.voltageL1Valid ||
-          !md.voltageL2Valid ||
-          !md.voltageL3Valid ||
-          !md.centiAmpereL1Valid ||
-          !md.centiAmpereL2Valid ||
-          !md.centiAmpereL3Valid)
-      {
-        writeDebugStringToBuf(debugbuf, sizeof(debugbuf), md, vv);
-        client.publish("house/electricity/status", debugbuf);
-      }
-    }
-    receiveBuffer.clear();
+  if (!md.activePowerPlusValid ||
+      !md.activePowerMinusValid ||
+      !md.reactivePowerPlusValid ||
+      !md.reactivePowerMinusValid ||
+      !md.voltageL1Valid ||
+      !md.voltageL2Valid ||
+      !md.voltageL3Valid ||
+      !md.centiAmpereL1Valid ||
+      !md.centiAmpereL2Valid ||
+      !md.centiAmpereL3Valid)
+  {
+    writeDebugStringToBuf(debugbuf, sizeof(debugbuf), md, frame);
+    client.publish("house/electricity/status", debugbuf);
   }
 }
 
 void setup() {
-  receiveBuffer.reserve(500);
   pinMode(LED_PIN, OUTPUT);     // Initialize the LED_PIN pin as an output
   Serial.begin(2400, SERIAL_8N1);
   Serial.swap();
@@ -190,6 +183,7 @@ void setup() {
 
 int bytesReceived = 0;
 int loopCounter = 0;
+MbusStreamParser streamParser(receiveBuffer, sizeof(receiveBuffer));
 
 // the loop function runs over and over again forever
 void loop() {
@@ -201,14 +195,9 @@ void loop() {
     }
     client.loop();
     while (Serial.available() > 0) {
-      receiveBuffer.push_back(Serial.read());
       bytesReceived++;
-      if (receiveBuffer.back() == 0x7E && receiveBuffer.size() > 5) {
-        parseData();
-      }
-      if (receiveBuffer.size() >= 1000) {
-        // Make sure we don't fill up the memory
-        receiveBuffer.clear();
+      if (streamParser.pushData(Serial.read())) {
+        parseData(streamParser.getFrame());
       }
     }
   }
@@ -216,8 +205,6 @@ void loop() {
 
   // Debug:
   snprintf(msg, sizeof(msg), "Looping. Loops=%ld", loopCounter);
-  client.publish("house/electricity/status", msg);
-  snprintf(msg, sizeof(msg), "BufSize=%ld", receiveBuffer.size());
   client.publish("house/electricity/status", msg);
   snprintf(msg, sizeof(msg), "Received bytes: %ld", bytesReceived);
   client.publish("house/electricity/status", msg);
