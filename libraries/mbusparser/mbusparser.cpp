@@ -111,8 +111,8 @@ enum PowerType {
 };
 
 uint32_t getPower(const VectorView& frame,
-		  PowerType type,
-		  bool& success)
+                  PowerType type,
+                  bool& success)
 {
   switch (type) {
   case VOLTAGE_L1:
