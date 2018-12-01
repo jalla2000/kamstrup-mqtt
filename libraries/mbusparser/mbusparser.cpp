@@ -132,6 +132,9 @@ MeterData parseMbusFrame(const VectorView& frame)
   //std::cout << "Frame format: " << (int)frameFormat << std::endl;
   size_t messageSize = ((frame[1] & 0x0F) << 8) | frame[2];
   //std::cout << "Message size: " << (uint32_t)messageSize << std::endl;
+  result.parseResultBufferSize = frame.size();
+  result.parseResultMessageSize = messageSize;
+
   if (frame.front() == 0x7E && frame.back() == 0x7E) {
     if (frameFormat == 0xA0) {
       // TODO: Parse header

@@ -34,6 +34,9 @@ struct MeterData {
   bool centiAmpereL2Valid = false;
   uint32_t centiAmpereL3 = 0;
   bool centiAmpereL3Valid = false;
+
+  size_t parseResultBufferSize = 0;
+  size_t parseResultMessageSize = 0;
 };
 
 struct VectorView {
