@@ -1,6 +1,16 @@
 #include "mbusparser.h"
 #include <cassert>
 
+size_t VectorView::find(const std::vector<uint8_t>& needle) const
+{
+  for (const uint8_t* it = m_start; it < (m_start+m_size-needle.size()); ++it) {
+    if (memcmp(it, &needle[0], needle.size()) == 0) {
+      return it-m_start;
+    }
+  }
+  return -1;
+}
+
 std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
 {
   std::vector<VectorView> result;
@@ -41,21 +51,6 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
   return result;
 }
 
-int find(const VectorView& haystack,
-	 const std::vector<uint8_t>& needle)
-{
-  for (size_t i = 0; i < haystack.size(); ++i) {
-    for (size_t j = 0; j < needle.size(); ++j) {
-      if (memcmp(&haystack[i], &needle[j], needle.size()-j) == 0) {
-	return i;
-      } else {
-	break;
-      }
-    }
-  }
-  return -1;
-}
-
 uint32_t getObisValue(const VectorView& frame,
 		      uint8_t codeA,
 		      uint8_t codeB,
@@ -68,7 +63,7 @@ uint32_t getObisValue(const VectorView& frame,
 {
   success = false;
   std::vector<uint8_t> theObis = { 0x09, 0x06, codeA, codeB, codeC, codeD, codeE, codeF };
-  int indexOfData = find(frame, theObis);
+  int indexOfData = frame.find(theObis);
   if (indexOfData >= 0) {
     //std::cout << "IndexOfActivePower: " << indexOfData << std::endl;
     const uint8_t * theBytes = &(frame[0]) + indexOfData + theObis.size() + 1;

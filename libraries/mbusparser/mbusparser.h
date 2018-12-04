@@ -54,6 +54,7 @@ struct VectorView {
   const uint8_t& front() const { return m_start[0]; }
   const uint8_t& back() const { return m_start[m_size-1]; }
   size_t size() const noexcept { return m_size; }
+  size_t find(const std::vector<uint8_t>& needle) const;
 private:
   const uint8_t* m_start;
   size_t m_size;
