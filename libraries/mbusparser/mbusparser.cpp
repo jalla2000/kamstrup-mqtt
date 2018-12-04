@@ -25,10 +25,10 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
     uint16_t messageSize = 0;
     for (size_t i = offset; i < data.size()-1; ++i) {
       if (data[i] == 0x7E && (data[i+1]&0xF0) == 0xA0) {
-	startFound = true;
-	start = i;
-	messageSize = (data[i+1]&0x0F << 8) | data[i+2];
-	break;
+        startFound = true;
+        start = i;
+        messageSize = (data[i+1]&0x0F << 8) | data[i+2];
+        break;
       }
     }
     if (!startFound) {
@@ -38,8 +38,8 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
     bool endFound = false;
     if (messageSize < data.size()-start) {
       if (data[start+messageSize+1] == 0x7E) {
-	endFound = true;
-	end = start+messageSize+2;
+        endFound = true;
+        end = start+messageSize+2;
       }
     }
     if (startFound && endFound && (end-start > 2)) {
@@ -52,14 +52,14 @@ std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
 }
 
 uint32_t getObisValue(const VectorView& frame,
-		      uint8_t codeA,
-		      uint8_t codeB,
-		      uint8_t codeC,
-		      uint8_t codeD,
-		      uint8_t codeE,
-		      uint8_t codeF,
-		      uint8_t size,
-		      bool & success)
+                      uint8_t codeA,
+                      uint8_t codeB,
+                      uint8_t codeC,
+                      uint8_t codeD,
+                      uint8_t codeE,
+                      uint8_t codeF,
+                      uint8_t size,
+                      bool & success)
 {
   success = false;
   std::vector<uint8_t> theObis = { 0x09, 0x06, codeA, codeB, codeC, codeD, codeE, codeF };
@@ -73,21 +73,21 @@ uint32_t getObisValue(const VectorView& frame,
     if (size == 2) {
       success = true;
       return
-	(uint32_t)theBytes[0] << (8*1) |
-	(uint32_t)theBytes[1];
+        (uint32_t)theBytes[0] << (8*1) |
+        (uint32_t)theBytes[1];
     } else if (size == 3) {
       success = true;
       return
-	(uint32_t)theBytes[0] << (8*2) |
-	(uint32_t)theBytes[1] << (8*1) |
-	(uint32_t)theBytes[2];
+        (uint32_t)theBytes[0] << (8*2) |
+        (uint32_t)theBytes[1] << (8*1) |
+        (uint32_t)theBytes[2];
     } else if (size == 4) {
       success = true;
       return
-	(uint32_t)theBytes[0] << (8*3) |
-	(uint32_t)theBytes[1] << (8*2) |
-	(uint32_t)theBytes[2] << (8*1) |
-	(uint32_t)theBytes[3];
+        (uint32_t)theBytes[0] << (8*3) |
+        (uint32_t)theBytes[1] << (8*2) |
+        (uint32_t)theBytes[2] << (8*1) |
+        (uint32_t)theBytes[3];
     }
   }
   return 0;
