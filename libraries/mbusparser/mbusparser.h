@@ -35,6 +35,15 @@ struct MeterData {
   uint32_t centiAmpereL3 = 0;
   bool centiAmpereL3Valid = false;
 
+  uint32_t activeImportWh = 0;
+  bool activeImportWhValid = false;
+  uint32_t activeExportWh = 0;
+  bool activeExportWhValid = false;
+
+  uint32_t reactiveImportWh = 0;
+  bool reactiveImportWhValid = false;
+  uint32_t reactiveExportWh = 0;
+  bool reactiveExportWhValid = false;
   size_t parseResultBufferSize = 0;
   size_t parseResultMessageSize = 0;
 };

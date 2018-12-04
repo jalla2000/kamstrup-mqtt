@@ -94,16 +94,20 @@ uint32_t getObisValue(const VectorView& frame,
 }
 
 enum PowerType {
-  ACTIVE_POWER_PLUS = 1,
-  ACTIVE_POWER_MINUS = 2,
-  REACTIVE_POWER_PLUS = 3,
-  REACTIVE_POWER_MINUS = 4,
-  CURRENT_L1 = 31, // 0x1F
-  CURRENT_L2 = 51, // 0x33
-  CURRENT_L3 = 71, // 0x47
-  VOLTAGE_L1 = 32, // 0x20
-  VOLTAGE_L2 = 52, // 0x34
-  VOLTAGE_L3 = 72 // 0x48
+  ACTIVE_POWER_PLUS,
+  ACTIVE_POWER_MINUS,
+  REACTIVE_POWER_PLUS,
+  REACTIVE_POWER_MINUS,
+  CURRENT_L1,
+  CURRENT_L2,
+  CURRENT_L3,
+  VOLTAGE_L1,
+  VOLTAGE_L2,
+  VOLTAGE_L3,
+  ACTIVE_IMPORT,
+  ACTIVE_EXPORT,
+  REACTIVE_IMPORT,
+  REACTIVE_EXPORT
 };
 
 uint32_t getPower(const VectorView& frame,
@@ -111,12 +115,21 @@ uint32_t getPower(const VectorView& frame,
                   bool& success)
 {
   switch (type) {
-  case VOLTAGE_L1:
-  case VOLTAGE_L2:
-  case VOLTAGE_L3:
-    return getObisValue(frame, 1, 1, type, 7, 0, 0xff, 2, success);
-  default:
-    return getObisValue(frame, 1, 1, type, 7, 0, 0xff, 4, success);
+  case ACTIVE_POWER_PLUS:    return getObisValue(frame, 1, 1, 1, 7, 0, 0xff, 4, success);
+  case ACTIVE_POWER_MINUS:   return getObisValue(frame, 1, 1, 2, 7, 0, 0xff, 4, success);
+  case REACTIVE_POWER_PLUS:  return getObisValue(frame, 1, 1, 3, 7, 0, 0xff, 4, success);
+  case REACTIVE_POWER_MINUS: return getObisValue(frame, 1, 1, 4, 7, 0, 0xff, 4, success);
+  case CURRENT_L1:           return getObisValue(frame, 1, 1, 31, 7, 0, 0xff, 4, success);
+  case CURRENT_L2:           return getObisValue(frame, 1, 1, 51, 7, 0, 0xff, 4, success);
+  case CURRENT_L3:           return getObisValue(frame, 1, 1, 71, 7, 0, 0xff, 4, success);
+  case VOLTAGE_L1:           return getObisValue(frame, 1, 1, 32, 7, 0, 0xff, 2, success);
+  case VOLTAGE_L2:           return getObisValue(frame, 1, 1, 52, 7, 0, 0xff, 2, success);
+  case VOLTAGE_L3:           return getObisValue(frame, 1, 1, 72, 7, 0, 0xff, 2, success);
+  case ACTIVE_IMPORT:        return getObisValue(frame, 1, 1, 1, 8, 0, 0xff, 4, success);
+  case ACTIVE_EXPORT:        return getObisValue(frame, 1, 1, 2, 8, 0, 0xff, 4, success);
+  case REACTIVE_IMPORT:      return getObisValue(frame, 1, 1, 3, 8, 0, 0xff, 4, success);
+  case REACTIVE_EXPORT:      return getObisValue(frame, 1, 1, 4, 8, 0, 0xff, 4, success);
+  default: return 0;
   }
 }
 
@@ -145,6 +158,10 @@ MeterData parseMbusFrame(const VectorView& frame)
       result.voltageL1 = getPower(frame, VOLTAGE_L1, result.voltageL1Valid);
       result.voltageL2 = getPower(frame, VOLTAGE_L2, result.voltageL2Valid);
       result.voltageL3 = getPower(frame, VOLTAGE_L3, result.voltageL3Valid);
+      result.activeImportWh = getPower(frame, ACTIVE_IMPORT, result.activeImportWhValid)*10;
+      result.activeExportWh = getPower(frame, ACTIVE_EXPORT, result.activeExportWhValid)*10;
+      result.reactiveImportWh = getPower(frame, REACTIVE_IMPORT, result.reactiveImportWhValid)*10;
+      result.reactiveExportWh = getPower(frame, REACTIVE_EXPORT, result.reactiveExportWhValid)*10;
     }
   }
   return result;
