@@ -21,6 +21,8 @@ run_tests.sh compiles and runs test_mbusparser.cpp, used for testing the parser.
 
 Example mqtt.items for OpenHab2:
 ```
+String kamstrupStatus "[%s]" {mqtt="<[mosquitto:house/electricity/status:state:default]"}
+
 Number kamstrupActivePowerPlus "[%dW]" {mqtt="<[mosquitto:house/electricity/power/activePowerPlus:state:default]"}
 Number kamstrupActivePowerMinus "[%dW]" {mqtt="<[mosquitto:house/electricity/power/activePowerMinus:state:default]"}
 Number kamstrupReactivePowerPlus "[%dW]" {mqtt="<[mosquitto:house/electricity/power/reactivePowerPlus:state:default]"}
@@ -33,6 +35,11 @@ Number kamstrupVoltageL3 "Voltage [%dV]" {mqtt="<[mosquitto:house/electricity/vo
 Number kamstrupCurrentL1 "Current [%.2fA]" {mqtt="<[mosquitto:house/electricity/current/l1:state:default]"}
 Number kamstrupCurrentL2 "Current [%.2fA]" {mqtt="<[mosquitto:house/electricity/current/l2:state:default]"}
 Number kamstrupCurrentL3 "Current [%.2fA]" {mqtt="<[mosquitto:house/electricity/current/l3:state:default]"}
+
+Number kamstrupActiveImport "[%.2fkWh]" {mqtt="<[mosquitto:house/electricity/energy/activeImport:state:default]"}
+Number kamstrupActiveExport "[%.2fkWh]" {mqtt="<[mosquitto:house/electricity/energy/activeExport:state:default]"}
+Number kamstrupReactiveImport "[%.2fkWh]" {mqtt="<[mosquitto:house/electricity/energy/reactiveImport:state:default]"}
+Number kamstrupReactiveExport "[%.2fkWh]" {mqtt="<[mosquitto:house/electricity/energy/reactiveExport:state:default]"}
 ```
 
 ![Schematics](https://raw.githubusercontent.com/jalla2000/kamstrup-mqtt/master/schematics.png)
