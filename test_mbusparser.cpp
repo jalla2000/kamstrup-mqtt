@@ -245,27 +245,6 @@ void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const
   writeFrameAsHex(buf+position, bufsize-position, frame);
 }
 
-void testFrameParser(const std::vector<uint8_t>& buffer)
-{
-  std::vector<VectorView> frames = getFrames(buffer);
-  std::cout << "Number of frames found: " << frames.size() << std::endl;
-  for (int i = 0; i < frames.size(); ++i) {
-    //printFrame(frames[i]);
-    MeterData powerInfo = parseMbusFrame(frames[i]);
-    printMeterData(powerInfo);
-    {
-      char hexbuf[1000];
-      writeFrameAsHex(hexbuf, sizeof(hexbuf), frames[i]);
-      std::cout << "Frame as hex: " << hexbuf << std::endl;
-    }
-    {
-      char debugbuf[1000];
-      writeDebugStringToBuf(debugbuf, sizeof(debugbuf), powerInfo, frames[i]);
-      std::cout << "Debug text: " << debugbuf << std::endl;
-    }
-  }
-}
-
 void testMbusStreamParser(const std::vector<uint8_t>& buffer)
 {
   uint8_t parseBuffer[1000];
@@ -302,8 +281,6 @@ void testMbusStreamParser(const std::vector<uint8_t>& buffer)
 
 int main() {
   std::vector<uint8_t> buffer = std::vector<uint8_t>(messysample, messysample+sizeof(messysample));
-  std::cout << std::endl << "TEST: testFrameParser" << std::endl;
-  testFrameParser(buffer);
   std::cout << std::endl << "TEST: testIntegerDivisionPrinting" << std::endl;
   testIntegerDivisionPrinting();
   std::cout << std::endl << "TEST: testMbusStreamParser" << std::endl;

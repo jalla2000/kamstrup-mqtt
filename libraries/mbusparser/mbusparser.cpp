@@ -11,46 +11,6 @@ size_t VectorView::find(const std::vector<uint8_t>& needle) const
   return -1;
 }
 
-std::vector<VectorView> getFrames(const std::vector<uint8_t>& data)
-{
-  std::vector<VectorView> result;
-  if (data.size() < 3) {
-    return result;
-  }
-  size_t offset = 0;
-  while (true) {
-    //std::cout << "Now searching from offset=" << offset << std::endl;
-    size_t start = 0;
-    bool startFound = false;
-    uint16_t messageSize = 0;
-    for (size_t i = offset; i < data.size()-1; ++i) {
-      if (data[i] == 0x7E && (data[i+1]&0xF0) == 0xA0) {
-        startFound = true;
-        start = i;
-        messageSize = (data[i+1]&0x0F << 8) | data[i+2];
-        break;
-      }
-    }
-    if (!startFound) {
-      return result;
-    }
-    size_t end = 0;
-    bool endFound = false;
-    if (messageSize < data.size()-start) {
-      if (data[start+messageSize+1] == 0x7E) {
-        endFound = true;
-        end = start+messageSize+2;
-      }
-    }
-    if (startFound && endFound && (end-start > 2)) {
-      //std::cout << "Start: " << start << " End: " << end << std::endl;
-      result.push_back(VectorView(data, start, end-start));
-    }
-    offset = end+1;
-  }
-  return result;
-}
-
 uint32_t getObisValue(const VectorView& frame,
                       uint8_t codeA,
                       uint8_t codeB,
