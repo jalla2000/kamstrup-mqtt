@@ -77,11 +77,11 @@ void writeFrameAsHex(char* buf, size_t bufsize, const VectorView& frame)
   }
 }
 
-
 void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const VectorView& frame)
 {
   size_t position = 0;
   position += snprintf(buf+position, bufsize-position, "SZ=%d ", frame.size());
+  position += snprintf(buf+position, bufsize-position, "MS=%d ", md.parseResultMessageSize);
   position += snprintf(buf+position, bufsize-position, "P+=%d ", md.activePowerPlusValid);
   position += snprintf(buf+position, bufsize-position, "P-=%d ", md.activePowerMinusValid);
   position += snprintf(buf+position, bufsize-position, "R+=%d ", md.reactivePowerMinusValid);
@@ -91,7 +91,11 @@ void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const
   position += snprintf(buf+position, bufsize-position, "V3=%d ", md.voltageL3Valid);
   position += snprintf(buf+position, bufsize-position, "A1=%d ", md.centiAmpereL1Valid);
   position += snprintf(buf+position, bufsize-position, "A2=%d ", md.centiAmpereL2Valid);
-  position += snprintf(buf+position, bufsize-position, "A3=%d", md.centiAmpereL3Valid);
+  position += snprintf(buf+position, bufsize-position, "A3=%d ", md.centiAmpereL3Valid);
+  position += snprintf(buf+position, bufsize-position, "AI=%d ", md.activeImportWhValid);
+  position += snprintf(buf+position, bufsize-position, "AO=%d ", md.activeExportWhValid);
+  position += snprintf(buf+position, bufsize-position, "RI=%d ", md.reactiveImportWhValid);
+  position += snprintf(buf+position, bufsize-position, "RO=%d", md.reactiveExportWhValid);
   position += snprintf(buf+position, bufsize-position, " ");
   writeFrameAsHex(buf+position, bufsize-position, frame);
 }
@@ -152,7 +156,38 @@ void parseData(const VectorView& frame) {
     client.publish("house/electricity/current/l3", msg);
   }
 
-  if (!md.activePowerPlusValid ||
+  if (md.activeImportWhValid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.activeImportWh / 1000);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.activeImportWh % 1000);
+    client.publish("house/electricity/energy/activeImport", msg);
+  }
+  if (md.activeExportWhValid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.activeExportWh / 1000);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.activeExportWh % 1000);
+    client.publish("house/electricity/energy/activeExport", msg);
+  }
+  if (md.reactiveImportWhValid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.reactiveImportWh / 1000);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.reactiveImportWh % 1000);
+    client.publish("house/electricity/energy/reactiveImport", msg);
+  }
+  if (md.reactiveExportWhValid) {
+    int position = 0;
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.reactiveExportWh / 1000);
+    position += snprintf(msg+position, sizeof(msg)-position, ".");
+    position += snprintf(msg+position, sizeof(msg)-position, "%u", md.reactiveExportWh % 1000);
+    client.publish("house/electricity/energy/reactiveExport", msg);
+  }
+
+  if ((md.listId == 1 && md.parseResultMessageSize != 226) ||
+      (md.listId == 2 && md.parseResultMessageSize != 300) ||
+      !md.activePowerPlusValid ||
       !md.activePowerMinusValid ||
       !md.reactivePowerPlusValid ||
       !md.reactivePowerMinusValid ||
@@ -161,7 +196,12 @@ void parseData(const VectorView& frame) {
       !md.voltageL3Valid ||
       !md.centiAmpereL1Valid ||
       !md.centiAmpereL2Valid ||
-      !md.centiAmpereL3Valid)
+      !md.centiAmpereL3Valid ||
+      (md.listId == 2 &&
+       (!md.activeImportWhValid ||
+        !md.activeExportWhValid ||
+        !md.reactiveImportWhValid ||
+        !md.reactiveExportWhValid)))
   {
     writeDebugStringToBuf(debugbuf, sizeof(debugbuf), md, frame);
     client.publish("house/electricity/status", debugbuf);
@@ -197,7 +237,13 @@ void loop() {
     while (Serial.available() > 0) {
       bytesReceived++;
       if (streamParser.pushData(Serial.read())) {
-        parseData(streamParser.getFrame());
+        VectorView frame = streamParser.getFrame();
+        if (streamParser.getContentType() == MbusStreamParser::COMPLETE_FRAME) {
+          parseData(frame);
+        } else {
+          writeDebugStringToBuf(debugbuf, sizeof(debugbuf), MeterData(), frame);
+          client.publish("house/electricity/status", debugbuf);
+        }
       }
     }
   }

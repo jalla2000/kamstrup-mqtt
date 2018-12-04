@@ -44,6 +44,8 @@ struct MeterData {
   bool reactiveImportWhValid = false;
   uint32_t reactiveExportWh = 0;
   bool reactiveExportWhValid = false;
+
+  uint8_t listId = 0;
   size_t parseResultBufferSize = 0;
   size_t parseResultMessageSize = 0;
 };
@@ -75,7 +77,12 @@ MeterData parseMbusFrame(const VectorView& frame);
 struct MbusStreamParser {
   MbusStreamParser(uint8_t * buff, size_t bufsize);
   bool pushData(uint8_t data);
-  VectorView getFrame();
+  const VectorView& getFrame();
+  enum BufferContent {
+    COMPLETE_FRAME,
+    TRASH_DATA
+  };
+  BufferContent getContentType() const;
 private:
   uint8_t* m_buf;
   size_t m_bufsize;
@@ -90,6 +97,7 @@ private:
   ParseState m_parseState = LOOKING_FOR_START;
   uint16_t m_messageSize = 0;
   VectorView m_frameFound;
+  BufferContent m_bufferContent = TRASH_DATA;
 };
 
 #endif

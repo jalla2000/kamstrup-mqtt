@@ -50,8 +50,6 @@ const uint8_t messysample[] = {
   0x09, 0x06, 0x01, 0x01, 0x48, 0x07, 0x00, 0xff, 0x12, 0x00, 0xdb, // Voltage L3
   0x79, 0xbc, 0x7e,
 
-  0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, // trash
-
   0x7e, 0xa0, 0xe2, 0x2b, 0x21, 0x13, 0x23, 0x9a,
   0xe6, 0xe7, 0x00, 0x0f, 0x00, 0x00, 0x00, 0x00, // Unknown
   0x0c, 0x07, 0xe2, 0x0b, 0x12, 0x07, 0x14, 0x17, 0x1e, 0xff, 0x80, 0x00, 0x00,
@@ -74,49 +72,121 @@ const uint8_t messysample[] = {
   0x09, 0x06, 0x01, 0x01, 0x48, 0x07, 0x00, 0xff, 0x12, 0x00, 0xdb, // Voltage L3
   0x79, 0xbc, 0x7e,
 
-  0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, // trash  
+  0xAA, 0xBB, 0xCC, 0x7E, // more trash
 
+  0x7E, 0xA1, 0x2C, 0x2B, 0x21, 0x13, 0xFC, 0x04,
+  0xE6, 0xE7, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00,
+  0x0C, 0x07, 0xE2, 0x0C, 0x03, 0x01, 0x16, 0x00, 0x05, 0xFF, 0x80, 0x00, 0x00,
+  0x02, 0x23, // List ID
+  0x0A, 0x0E, 0x4B, 0x61, 0x6D, 0x73, 0x74, 0x72, 0x75, 0x70, 0x5F, 0x56, 0x30, 0x30, 0x30, 0x31,
+  0x09, 0x06, 0x01, 0x01, 0x00, 0x00, 0x05, 0xFF, 0x0A, 0x10, 0x35, 0x37, 0x30, 0x36, 0x35, 0x36, 0x37, 0x32, 0x38, 0x34, 0x32, 0x33, 0x35, 0x31, 0x36, 0x37,
+  0x09, 0x06, 0x01, 0x01, 0x60, 0x01, 0x01, 0xFF, 0x0A, 0x12, 0x36, 0x38, 0x34, 0x31, 0x31, 0x32, 0x31, 0x42, 0x4E, 0x32, 0x34, 0x33, 0x31, 0x30, 0x31, 0x30, 0x34, 0x30,
+  0x09, 0x06, 0x01, 0x01, 0x01, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x16, 0x63, // 1,1,1,7,0: Active, Power +
+  0x09, 0x06, 0x01, 0x01, 0x02, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, // 1,1,2,7,0: Active, Power -
+  0x09, 0x06, 0x01, 0x01, 0x03, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x01, 0x5B, // 1,1,3,7,0: Reactive Power +
+  0x09, 0x06, 0x01, 0x01, 0x04, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, // 1,1,4,7,0: Reactive Power -
+  0x09, 0x06, 0x01, 0x01, 0x1F, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x04, 0x58, // 1,1,31,7,0: Current L1
+  0x09, 0x06, 0x01, 0x01, 0x33, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x08, 0xEA, // 1,1,51,7,0: Current L2
+  0x09, 0x06, 0x01, 0x01, 0x47, 0x07, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x06, 0x10, // 1,1,71,7,0: Current L3
+  0x09, 0x06, 0x01, 0x01, 0x20, 0x07, 0x00, 0xFF, 0x12, 0x00, 0xD9, // 1,1,32,7,0: Voltage, L1
+  0x09, 0x06, 0x01, 0x01, 0x34, 0x07, 0x00, 0xFF, 0x12, 0x00, 0xDA, // 1,1,52,7,0: Voltage, L2
+  0x09, 0x06, 0x01, 0x01, 0x48, 0x07, 0x00, 0xFF, 0x12, 0x00, 0xD6, // 1,1,72,7,0: Voltage, L3
+  0x09, 0x06, 0x00, 0x01, 0x01, 0x00, 0x00, 0xFF, 0x09, 0x0C, 0x07, 0xE2, 0x0C, 0x03, 0x01, 0x16, 0x00, 0x05, 0xFF, 0x80, 0x00, 0x00, // 0,1,1,0,0: Clock and date in meter
+  0x09, 0x06, 0x01, 0x01, 0x01, 0x08, 0x00, 0xFF, 0x06, 0x00, 0x0B, 0xDA, 0x85, // 1,1,1,8,0: Cumulative hourly active import energy (A+)(Q1+Q4)
+  0x09, 0x06, 0x01, 0x01, 0x02, 0x08, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x00, 0x00, // 1,1,2,8,0: Cumulative hourly active export energy (A-)(Q2+Q3)
+  0x09, 0x06, 0x01, 0x01, 0x03, 0x08, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x52, 0xD3, // 1,1,3,8,0: Cumulative hourly reactive import energy (R+)(Q1+Q4)
+  0x09, 0x06, 0x01, 0x01, 0x04, 0x08, 0x00, 0xFF, 0x06, 0x00, 0x00, 0x89, 0xB1, // 1,1,4,8,0: Cumulative hourly reactive export energy (R-)(Q3+Q4)
+  0xA9, 0xC0, 0x7E,
+
+  0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF // more trash data
 };
 
 void printMeterData(const MeterData & meterData)
 {
+  std::cout << "List ID: " << (unsigned)meterData.listId << std::endl;
+  std::cout << "Message size: " << meterData.parseResultMessageSize << std::endl;
   std::cout << "Active power+: ";
   if (meterData.activePowerPlusValid) {
     std::cout << meterData.activePowerPlus << " W" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   std::cout << "Active power-: ";
   if (meterData.activePowerMinusValid) {
     std::cout << meterData.activePowerMinus << " W"<< std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   std::cout << "Reactive power+: ";
   if (meterData.reactivePowerPlusValid) {
     std::cout << meterData.reactivePowerPlus << " W"<< std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   std::cout << "Reactive power-: ";
   if (meterData.reactivePowerMinusValid) {
     std::cout << meterData.reactivePowerMinus << " W" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   if (meterData.centiAmpereL1Valid) {
     std::cout << "Current phase L1: " << meterData.centiAmpereL1/100.0 << " A" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   if (meterData.centiAmpereL2Valid) {
     std::cout << "Current phase L2: " << meterData.centiAmpereL2/100.0 << " A" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   if (meterData.centiAmpereL3Valid) {
     std::cout << "Current phase L3: " << meterData.centiAmpereL3/100.0 << " A" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
 
   std::cout << "Voltage phase L1: ";
   if (meterData.voltageL1Valid) {
     std::cout << meterData.voltageL1 << " V" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   std::cout << "Voltage phase L2: ";
   if (meterData.voltageL2Valid) {
     std::cout << meterData.voltageL2 << " V" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
   std::cout << "Voltage phase L3: ";
   if (meterData.voltageL3Valid) {
     std::cout << meterData.voltageL3 << " V" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
+  }
+
+  std::cout << "Cumulative Hourly Active Import: ";
+  if (meterData.activeImportWhValid) {
+    std::cout << meterData.activeImportWh/1000.0 << " kWh" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
+  }
+  std::cout << "Cumulative Hourly Active Export: ";
+  if (meterData.activeExportWhValid) {
+    std::cout << meterData.activeExportWh/1000.0 << " kWh" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
+  }
+  std::cout << "Cumulative Hourly Reactive Import: ";
+  if (meterData.reactiveImportWhValid) {
+    std::cout << meterData.reactiveImportWh/1000.0 << " kWh" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
+  }
+  std::cout << "Cumulative Hourly Reactive Export: ";
+  if (meterData.reactiveExportWhValid) {
+    std::cout << meterData.reactiveExportWh/1000.0 << " kWh" << std::endl;
+  } else {
+    std::cout << "N/A" << std::endl;
   }
 }
 
@@ -167,6 +237,10 @@ void writeDebugStringToBuf(char* buf, size_t bufsize, const MeterData& md, const
   position += snprintf(buf+position, bufsize-position, "A1=%d ", md.centiAmpereL1Valid);
   position += snprintf(buf+position, bufsize-position, "A2=%d ", md.centiAmpereL2Valid);
   position += snprintf(buf+position, bufsize-position, "A3=%d", md.centiAmpereL3Valid);
+  position += snprintf(buf+position, bufsize-position, "AI=%d", md.activeImportWhValid);
+  position += snprintf(buf+position, bufsize-position, "AO=%d", md.activeExportWhValid);
+  position += snprintf(buf+position, bufsize-position, "RI=%d", md.reactiveImportWhValid);
+  position += snprintf(buf+position, bufsize-position, "RO=%d", md.reactiveExportWhValid);
   position += snprintf(buf+position, bufsize-position, " ");
   writeFrameAsHex(buf+position, bufsize-position, frame);
 }
@@ -196,15 +270,33 @@ void testMbusStreamParser(const std::vector<uint8_t>& buffer)
 {
   uint8_t parseBuffer[1000];
   MbusStreamParser streamParser(parseBuffer, sizeof(parseBuffer));
+  unsigned completeFramesCounter = 0;
+  unsigned trashDataCounter = 0;
   for (uint8_t data : buffer) {
     if (streamParser.pushData(data)) {
       VectorView frame = streamParser.getFrame();
-      char hexbuf[1000];
+      char hexbuf[1000] = {};
       writeFrameAsHex(hexbuf, sizeof(hexbuf), frame);
-      std::cout << "Stream parser returned the frame: " << std::endl;
-      std::cout << hexbuf << std::endl;
-      //MeterData powerInfo = parseMbusFrame(frame);
+      if (streamParser.getContentType() == MbusStreamParser::TRASH_DATA) {
+        std::cout << "Stream parser returned trash data of size=" << frame.size() << ":" << std::endl;
+        std::cout << "DATA: " << hexbuf << std::endl;
+        trashDataCounter++;
+      } else if (streamParser.getContentType() == MbusStreamParser::COMPLETE_FRAME) {
+        std::cout << "Stream parser returned the complete frame: " << std::endl;
+        std::cout << "DATA: " << hexbuf << std::endl;
+        MeterData powerInfo = parseMbusFrame(frame);
+        printMeterData(powerInfo);
+        completeFramesCounter++;
+      }
     }
+  }
+  if (completeFramesCounter != 3) {
+    std::cout << "Complete frames: " << completeFramesCounter << std::endl;
+    assert(false);
+  }
+  if (trashDataCounter != 3) {
+    std::cout << "Complete frames: " << trashDataCounter << std::endl;
+    assert(false);
   }
 }
 
