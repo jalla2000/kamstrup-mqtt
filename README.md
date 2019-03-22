@@ -1,6 +1,8 @@
 # kamstrup-mqtt
 Receives data from Kamstrup energy meter and sends it over MQTT
 
+WARNING: The serial connection seems unstable. It may be because the serial output from the kamstrup is not properly compatible with the NodeMCU serial port. The code should be tested with an MBUS-converter to make sure.
+
 Includes Makefile for building the sketch from a terminal (arduino-mk)
 
 To build:
